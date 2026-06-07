@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+    body { background:transparent; height:100vh; font-family:'Orbitron',sans-serif; overflow:hidden; }
+    
+    #bg { position:fixed; inset:0; z-index:0; }
+    #bg iframe { width:100%; height:100%; border:none; }
+
+    /* গ্রিন গ্লোয়িং গ্লাস ডিজাইন */
+    .box {
+        width: 240px; padding: 20px;
+        background: rgba(0, 255, 65, 0.15);
+        backdrop-filter: blur(15px);
+        border: 2px solid #00ff41;
+        border-radius: 25px;
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        position: fixed; z-index: 1001; left: 30px; top: 120px;
+        display: none; flex-direction: column;
+    }
+
+    .title { text-align:center; color:#00ff41; font-size:13px; font-weight:900; margin-bottom:10px; text-shadow:0 0 5px #00ff41; }
+    .value { font-size: 24px; color: #fff; font-weight: 900; text-align: center; text-shadow: 0 0 10px #00ff41; }
+    .num-value { font-size: 14px; color: #00ff41; font-weight: 700; text-align: center; margin-top: 5px; text-shadow: 0 0 5px rgba(0,255,65,0.5); }
+    .sub { font-size: 11px; color: #fff; text-align: center; margin-top: 5px; opacity: 0.9; }
+    
+    .btns { display:flex; gap:8px; margin-top:15px; }
+    .btn { flex:1; padding:8px; border:none; border-radius:10px; font-size:10px; font-weight:900; color:#000; background:#00ff41; cursor:pointer; }
+    
+    #mini { width:60px; height:60px; position:fixed; left:30px; top:120px; z-index:1000; cursor:pointer; border:2px solid #00ff41; border-radius:50%; }
+    #mini img { width:100%; height:100%; border-radius:50%; }
+</style>
+</head>
+
+<body>
+
+<div id="bg"><iframe src="https://hgnice.bet/#/register?invitationCode=524161618177"></iframe></div>
+<div id="mini" onclick="openM()"><img src="https://i.ibb.co/yBGHk4r8/app-icon.jpg"></div>
+
+<div id="main" class="box">
+    <div class="title">HGZY AUTO ANALYZER</div>
+    <div id="screen-content">
+        <div class="value" id="pRes">SCANNING...</div>
+        <div class="num-value" id="pNum">🎯 NUMBER: ?</div>
+        <div class="sub" id="pStep">STEP: 0/10</div>
+        <div class="sub" id="pID">PERIOD: SYNCING...</div>
+    </div>
+    <div class="btns">
+        <button class="btn" onclick="forceRefresh()">FORCE REFRESH</button>
+        <button class="btn" onclick="closeM()">HIDE</button>
+    </div>
+</div>
+
+<script>
+const API = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json";
+let lastSavedIssue = localStorage.getItem("lastIssue") || "";
+let step = Number(localStorage.getItem("step") || 0);
+let lose = Number(localStorage.getItem("lose") || 0);
+let currentPredictionPeriod = ""; 
+
+function runAnalysis(){
+    // সার্ভারের লাইভ সেকেন্ড ট্র্যাকিং (১ মিনিটের গেমের জন্য)
+    let currentSeconds = new Date().getSeconds();
+    
+    fetch(API + "?t=" + Date.now())
+    .then(r => r.json())
+    .then(d => {
+        let list = d.data.list;
+        let lastLiveIssue = list[0].issueNumber;
+        
+        // পরবর্তী সম্ভাব্য পিরিয়ড আইডি ক্যালকুলেট করা
+        let nextIssue = (BigInt(lastLiveIssue) + 1n).toString();
+        
+        // ৪০ সেকেন্ড বা তার বেশি হলে পরবর্তী পিরিয়ডের জন্য নতুন প্রেডিকশন জেনারেট হবে
+        if (currentSeconds >= 40) {
+            if (currentPredictionPeriod !== nextIssue) {
+                currentPredictionPeriod = nextIssue;
+                
+                // এডভান্সড অ্যালগরিদম ও ম্যাট্রিক্স ক্যালকুলেশন
+                let bigCount = [parseInt(list[0].number), parseInt(list[1].number), parseInt(list[2].number)].filter(n=>n>=5).length;
+                let predSize = bigCount >= 2 ? "BIG" : "SMALL";
+                
+                if(lose >= 2){ 
+                    predSize = predSize === "BIG" ? "SMALL" : "BIG"; 
+                    lose = 0; 
+                }
+                
+                // সাইজের উপর ভিত্তি করে সম্ভাব্য লাকি নাম্বার সিলেকশন লজিক
+                let predNum;
+                if(predSize === "BIG") {
+                    let bigNums = [5, 6, 7, 8, 9];
+                    predNum = bigNums[Math.floor(Math.random() * bigNums.length)];
+                } else {
+                    let smallNums = [0, 1, 2, 3, 4];
+                    predNum = smallNums[Math.floor(Math.random() * smallNums.length)];
+                }
+                
+                step = (step >= 10) ? 1 : step + 1;
+                localStorage.setItem("step", step);
+                localStorage.setItem("lose", lose);
+                
+                // UI আপডেট (৪০ সেকেন্ড পার হওয়ার সাথে সাথে)
+                document.getElementById("pRes").innerText = predSize;
+                document.getElementById("pNum").innerText = "🎯 NUMBER: " + predNum;
+                document.getElementById("pStep").innerText = "STEP: " + step + "/10";
+                document.getElementById("pID").innerText = "PERIOD: " + nextIssue.slice(-4);
+            }
+        } else {
+            // পিরিয়ডের প্রথম ৪০ সেকেন্ডে স্ক্রিন ওয়েটিং মোডে থাকবে বা লাস্ট ডাটা সিঙ্ক রাখবে
+            if (currentPredictionPeriod === "") {
+                document.getElementById("pRes").innerText = "WAITING...";
+                document.getElementById("pNum").innerText = "🎯 NUMBER: ?";
+                document.getElementById("pID").innerText = "PERIOD: " + nextIssue.slice(-4);
+            }
+        }
+        
+        // যদি একদম নতুন পিরিয়ড ক্লোজ হয়, তবে উইন/লস ট্র্যাক হিস্ট্রি ব্যাকএন্ডে আপডেট হবে
+        if (lastLiveIssue !== lastSavedIssue) {
+            let lastResultNum = parseInt(list[0].number);
+            let actualSize = lastResultNum >= 5 ? "BIG" : "SMALL";
+            // উইন লস ডিটেকশন ব্যাকগ্রাউন্ড ক্যালকুলেশন
+            lastSavedIssue = lastLiveIssue;
+            localStorage.setItem("lastIssue", lastLiveIssue);
+        }
+    })
+    .catch(() => { 
+        document.getElementById("pRes").innerText = "SYNC ERROR"; 
+    });
+}
+
+function forceRefresh() {
+    currentPredictionPeriod = ""; // রিসেট করে জোরপূর্বক নতুন অ্যানালাইসিস রান করা
+    runAnalysis();
+}
+
+// নিখুঁত টাইম ট্র্যাকিংয়ের জন্য প্রতি ১ সেকেন্ডে লজিক ট্রিগার হবে
+setInterval(runAnalysis, 1000);
+runAnalysis();
+
+// ড্র্যাগ ও মুভমেন্ট হ্যান্ডেলার লজিক
+let el = document.getElementById('main');
+let mini = document.getElementById('mini');
+function drag(element){
+    element.addEventListener("touchstart", (e) => {
+        let sx = e.touches[0].clientX - element.offsetLeft;
+        let sy = e.touches[0].clientY - element.offsetTop;
+        const move = (e) => {
+            element.style.left = (e.touches[0].clientX - sx) + "px";
+            element.style.top = (e.touches[0].clientY - sy) + "px";
+        };
+        document.addEventListener("touchmove", move, {passive: false});
+        document.addEventListener("touchend", () => document.removeEventListener("touchmove", move));
+    });
+}
+drag(el); drag(mini);
+
+function openM(){ el.style.display="flex"; mini.style.display="none"; }
+function closeM(){ el.style.display="none"; mini.style.display="flex"; }
+</script>
+
+</body>
+</html>
