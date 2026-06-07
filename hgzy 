@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+    body { background:transparent; height:100vh; font-family:'Orbitron',sans-serif; overflow:hidden; }
+    
+    #bg { position:fixed; inset:0; z-index:0; }
+    #bg iframe { width:100%; height:100%; border:none; }
+
+    /* পাসওয়ার্ড স্ক্রিন */
+    #login-screen {
+        position: fixed; inset: 0; background: #050f08; z-index: 9999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .login-box {
+        background: rgba(0, 255, 65, 0.1); padding: 20px; border: 2px solid #00ff41;
+        border-radius: 15px; text-align: center; width: 280px;
+    }
+    .login-box input { width:100%; padding:10px; background:#000; border:1px solid #00ff41; color:#fff; border-radius:5px; margin-bottom:10px; text-align:center; }
+    .login-box button { width:100%; padding:10px; border:none; background:#00ff41; font-weight:900; cursor:pointer; border-radius:5px; }
+
+    /* মেইন বক্স */
+    .box {
+        width: 240px; padding: 20px;
+        background: rgba(0, 255, 65, 0.15);
+        backdrop-filter: blur(15px);
+        border: 2px solid #00ff41;
+        border-radius: 25px;
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        position: fixed; z-index: 1001; left: 30px; top: 120px;
+        display: none; flex-direction: column;
+    }
+
+    .title { text-align:center; color:#00ff41; font-size:13px; font-weight:900; margin-bottom:10px; }
+    .value { font-size: 24px; color: #ff3333; font-weight: 900; text-align: center; }
+    .num-value { font-size: 14px; color: #ff3333; font-weight: 700; text-align: center; margin-top: 5px; }
+    .sub { font-size: 11px; color: #fff; text-align: center; margin-top: 5px; opacity: 0.9; }
+    
+    .btns { display:flex; gap:8px; margin-top:15px; }
+    .btn { flex:1; padding:8px; border:none; border-radius:10px; font-size:10px; font-weight:900; color:#000; background:#00ff41; cursor:pointer; }
+    
+    #mini { width:60px; height:60px; position:fixed; left:30px; top:120px; z-index:1000; cursor:pointer; border:2px solid #00ff41; border-radius:50%; display:none; }
+    #mini img { width:100%; height:100%; border-radius:50%; }
+</style>
+</head>
+
+<body>
+
+<div id="login-screen">
+    <div class="login-box">
+        <h2 style="color:#00ff41; margin-bottom:10px;">ACCESS KEY</h2>
+        <input type="password" id="passkey" placeholder="ENTER PASSWORD">
+        <button onclick="verifyPass()">CONNECT</button>
+    </div>
+</div>
+
+<div id="bg"><iframe src="https://hgnice.bet/#/register?invitationCode=524161618177"></iframe></div>
+<div id="mini" onclick="openM()"><img src="https://i.ibb.co/yBGHk4r8/app-icon.jpg"></div>
+
+<div id="main" class="box">
+    <div class="title">HGZY AUTO ANALYZER</div>
+    <div id="screen-content">
+        <div class="value" id="pRes">LOCKED</div>
+        <div class="num-value" id="pNum">❌ DEPOSIT REQUIRED</div>
+        <div class="sub" id="pStep">STEP: 0/10</div>
+        <div class="sub" id="pID">STATUS: UNAUTHORIZED</div>
+    </div>
+    <div class="btns">
+        <button class="btn" onclick="forceRefresh()">REFRESH</button>
+        <button class="btn" onclick="closeM()">HIDE</button>
+    </div>
+</div>
+
+<script>
+const MASTER_PASSWORD = "apun26";
+let isAuthenticated = false;
+let hasDeposited = false; // এখানে আপনি ম্যানুয়ালি true করে দিতে পারেন অথবা ডাটাবেস লিংক করতে পারেন
+
+function verifyPass() {
+    let input = document.getElementById("passkey").value;
+    if (input === MASTER_PASSWORD) {
+        isAuthenticated = true;
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("mini").style.display = "block";
+        alert("System Connected Successfully!");
+    } else {
+        alert("Invalid Password!");
+    }
+}
+
+// আপনার মূল লজিকটি এখানে আগের মতো থাকবে...
+// শুধু সিগন্যাল দেখানোর আগে `if (!hasDeposited)` চেকটি বসিয়ে দিতে হবে।
+
+function forceRefresh() {
+    if(!hasDeposited) {
+        alert("DEPOSIT NOT VERIFIED!");
+        return;
+    }
+    // Refresh logic here
+}
+
+function openM(){ document.getElementById('main').style.display="flex"; document.getElementById('mini').style.display="none"; }
+function closeM(){ document.getElementById('main').style.display="none"; document.getElementById('mini').style.display="block"; }
+
+</script>
+</body>
+</html>
